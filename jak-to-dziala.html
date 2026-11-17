@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Jak burnit.chat tworzy jednorazowy, szyfrowany kanał rozmowy.">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'">
+    <meta name="theme-color" content="#090d0c">
+    <title>Jak to działa? — burnit.chat</title>
+    <link rel="icon" href="./assets/burnit-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body class="info-page">
+<main class="info-shell">
+    <header class="brand info-header">
+        <a class="brand__mark" href="./" aria-label="burnit.chat — strona główna">
+            <img src="./assets/burnit-mark.svg" alt="">
+        </a>
+        <div>
+            <strong>burnit.chat</strong>
+            <span>ephemeral encrypted channel</span>
+        </div>
+        <a class="info-link" href="./">Wróć do czatu</a>
+        <nav class="language-switcher" aria-label="Wybierz język">
+            <a href="./set-language.php?lang=pl&amp;return=info" data-language="pl"
+               aria-label="Wersja polska" title="Polski">
+                <img src="./assets/flag-pl.svg" alt="">
+            </a>
+            <a href="./set-language.php?lang=en&amp;return=info" data-language="en"
+               aria-label="English version" title="English">
+                <img src="./assets/flag-en.svg" alt="">
+            </a>
+        </nav>
+    </header>
+
+    <section class="info-hero">
+        <div class="eyebrow"><span>●</span> Jak to działa?</div>
+        <h1>Zaszyfrowany tunel.<br><span>Tylko między wami.</span></h1>
+        <p>
+            Dwie przeglądarki tworzą wspólny, poufny kanał istniejący tylko
+            podczas rozmowy. Zaszyfrowane dane są przekazywane przez serwer,
+            ale tylko wasze przeglądarki mają klucze pozwalające je odczytać.
+        </p>
+    </section>
+
+    <section class="plain-tunnel" aria-labelledby="plain-tunnel-title">
+        <div class="plain-tunnel__visual" aria-hidden="true">
+            <span>TY</span><i></i><strong>⌁ E2EE ⌁</strong><i></i><span>2. OSOBA</span>
+        </div>
+        <div>
+            <div class="eyebrow">Najprościej mówiąc</div>
+            <h2 id="plain-tunnel-title">Bez loginów. Bez maili. Bez kont.</h2>
+            <p>
+                Nie potwierdzamy tożsamości i nie zakładamy profili. Link łączy
+                dokładnie dwie osoby, a rozmowa żyje wyłącznie w pamięci ich
+                otwartych kart. Gdy kanał zostanie spalony, nie ma archiwum,
+                do którego można wrócić.
+            </p>
+        </div>
+        <ul aria-label="Czego nie wymagamy">
+            <li>loginu</li>
+            <li>adresu e-mail</li>
+            <li>numeru telefonu</li>
+            <li>historii konta</li>
+        </ul>
+    </section>
+
+    <section class="info-section" aria-labelledby="key-exchange-title">
+        <div class="section-heading">
+            <span>01</span>
+            <div>
+                <h2 id="key-exchange-title">Wymiana kluczy</h2>
+                <p>Klucze prywatne nigdy nie opuszczają urządzeń.</p>
+            </div>
+        </div>
+
+        <div class="key-diagram key-diagram--desktop" role="img"
+             aria-label="Klucze publiczne przechodzą przez serwer pośredniczący, obie przeglądarki wyliczają ten sam sekret i tworzą zaszyfrowany tunel end-to-end">
+            <div class="diagram-phase">
+                <span>01 / PUBLIC HANDSHAKE</span>
+                <small>serwer pośredniczący przekazuje wyłącznie dane publiczne</small>
+            </div>
+
+            <div class="diagram-party diagram-party--a">
+                <span class="party-icon">A</span>
+                <strong>Twórca</strong>
+                <small><b>Private A</b> zostaje tutaj</small>
+            </div>
+            <div class="diagram-relay">
+                <span>SERWER</span>
+                <strong>pośredniczący</strong>
+                <small>przekazuje · nie odszyfrowuje</small>
+                <i aria-hidden="true"></i>
+            </div>
+            <div class="diagram-party diagram-party--b">
+                <span class="party-icon">B</span>
+                <strong>Gość</strong>
+                <small><b>Private B</b> zostaje tutaj</small>
+            </div>
+
+            <div class="diagram-routes">
+                <div>
+                    <span>A</span>
+                    <code>PUBLIC A</code>
+                    <i aria-hidden="true">→</i>
+                    <em>serwer</em>
+                    <i aria-hidden="true">→</i>
+                    <span>B</span>
+                </div>
+                <div>
+                    <span>A</span>
+                    <i aria-hidden="true">←</i>
+                    <em>serwer</em>
+                    <i aria-hidden="true">←</i>
+                    <code>PUBLIC B</code>
+                    <span>B</span>
+                </div>
+            </div>
+
+            <div class="diagram-secret diagram-secret--a">
+                <span>02 / lokalnie</span>
+                <strong>ECDH + HKDF</strong>
+                <small>Private A × Public B</small>
+            </div>
+            <div class="diagram-equals" aria-hidden="true">
+                <span>=</span>
+                <small>ten sam sekret</small>
+            </div>
+            <div class="diagram-secret diagram-secret--b">
+                <span>02 / lokalnie</span>
+                <strong>ECDH + HKDF</strong>
+                <small>Private B × Public A</small>
+            </div>
+
+            <div class="diagram-channel">
+                <span class="diagram-channel__end">A</span>
+                <i aria-hidden="true"></i>
+                <div>
+                    <small>03 / ENCRYPTED TUNNEL</small>
+                    <strong>Key A→B &nbsp;·&nbsp; AES-256-GCM &nbsp;·&nbsp; Key B→A</strong>
+                    <span>serwer widzi tylko zaszyfrowane dane</span>
+                </div>
+                <i aria-hidden="true"></i>
+                <span class="diagram-channel__end">B</span>
+            </div>
+        </div>
+
+        <div class="key-diagram-mobile" role="img"
+             aria-label="Na telefonie: najpierw obie strony wymieniają klucze publiczne przez serwer pośredniczący, następnie lokalnie obliczają ten sam sekret i otwierają zaszyfrowany tunel end-to-end">
+            <article class="mobile-key-stage">
+                <span class="mobile-key-stage__number">01</span>
+                <div>
+                    <strong>Wymiana publiczna</strong>
+                    <small>Serwer tylko przekazuje klucze publiczne.</small>
+                </div>
+                <div class="mobile-public-route" aria-hidden="true">
+                    <span>A</span>
+                    <i></i>
+                    <em>SERWER</em>
+                    <i></i>
+                    <span>B</span>
+                    <small>PUBLIC A → B &nbsp;·&nbsp; PUBLIC B → A</small>
+                </div>
+                <p>Private A i Private B nigdy nie opuszczają telefonów.</p>
+            </article>
+
+            <div class="mobile-stage-link" aria-hidden="true"><i></i><span>lokalnie</span><i></i></div>
+
+            <article class="mobile-key-stage">
+                <span class="mobile-key-stage__number">02</span>
+                <div>
+                    <strong>Ten sam sekret</strong>
+                    <small>Każda strona oblicza go u siebie.</small>
+                </div>
+                <div class="mobile-secret-row" aria-hidden="true">
+                    <span>A</span>
+                    <code>ECDH + HKDF</code>
+                    <b>=</b>
+                    <code>ECDH + HKDF</code>
+                    <span>B</span>
+                </div>
+            </article>
+
+            <div class="mobile-stage-link" aria-hidden="true"><i></i><span>szyfrowanie</span><i></i></div>
+
+            <article class="mobile-key-stage mobile-key-stage--channel">
+                <span class="mobile-key-stage__number">03</span>
+                <div>
+                    <strong>Tunel end-to-end</strong>
+                    <small>AES-256-GCM · osobny klucz w każdym kierunku</small>
+                </div>
+                <div class="mobile-channel-row" aria-hidden="true">
+                    <span>A</span><i></i><strong>ZASZYFROWANE DANE</strong><i></i><span>B</span>
+                </div>
+                <p>Serwer nie ma kluczy AES i nie może przeczytać rozmowy.</p>
+            </article>
+        </div>
+
+        <ol class="steps">
+            <li>
+                <span>1</span>
+                <div>
+                    <h3>Para kluczy twórcy</h3>
+                    <p>Twórca generuje ulotną parę ECDH. Identyfikator pokoju to 128-bitowy skrót klucza publicznego twórcy.</p>
+                </div>
+            </li>
+            <li>
+                <span>2</span>
+                <div>
+                    <h3>Krótkie zaproszenie</h3>
+                    <p>Zaproszenie zawiera tylko krótki identyfikator pokoju. Pełny klucz publiczny twórcy jest tymczasowo przechowywany w pamięci serwera.</p>
+                </div>
+            </li>
+            <li>
+                <span>3</span>
+                <div>
+                    <h3>Wymiana publiczna</h3>
+                    <p>Podczas dołączenia serwer przekazuje klucze publiczne obu stron. Klucze prywatne nie opuszczają przeglądarek.</p>
+                </div>
+            </li>
+            <li>
+                <span>4</span>
+                <div>
+                    <h3>Sprawdzenie klucza</h3>
+                    <p>Gość sprawdza, czy skrót klucza twórcy pasuje do identyfikatora z linku. Potem obie strony wyprowadzają klucze AES.</p>
+                </div>
+            </li>
+            <li>
+                <span>5</span>
+                <div>
+                    <h3>Otwarcie tunelu</h3>
+                    <p>Zaszyfrowane potwierdzenie kluczy otwiera kanał. Od tej chwili serwer widzi tylko zaszyfrowane dane.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="info-section" aria-labelledby="lifecycle-title">
+        <div class="section-heading">
+            <span>02</span>
+            <div>
+                <h2 id="lifecycle-title">Życie pokoju</h2>
+                <p>Pokój istnieje tylko tak długo, jak połączenie.</p>
+            </div>
+        </div>
+
+        <div class="lifecycle">
+            <article>
+                <span>1</span>
+                <h3>Oczekiwanie</h3>
+                <p>Zaproszenie czeka maksymalnie 15 minut i przyjmuje tylko pierwszego gościa. Twórca może bezpiecznie wrócić po chwilowym rozłączeniu przez 2 minuty, a strona gościa automatycznie ponawia połączenie co 3 sekundy.</p>
+            </article>
+            <article>
+                <span>2</span>
+                <h3>Rozmowa</h3>
+                <p>Wiadomości istnieją w pamięci dwóch otwartych kart. Serwer nie zapisuje historii, a po chwilowej utracie połączenia obie strony mają 2 minuty na powrót.</p>
+            </article>
+            <article>
+                <span>3</span>
+                <h3>Rozłączenie</h3>
+                <p>Chwilowa utrata sieci daje obu stronom 2 minuty na powrót. Świadome zakończenie natychmiast unieważnia pokój.</p>
+            </article>
+            <article>
+                <span>4</span>
+                <h3>Spalenie</h3>
+                <p>Rekord pokoju znika z MySQL, drugie gniazdo jest zamykane, a klucze i wiadomości są usuwane z widoku.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="info-section info-grid" aria-labelledby="server-knowledge-title">
+        <div>
+            <div class="section-heading section-heading--compact">
+                <span>03</span>
+                <h2 id="server-knowledge-title">Co widzi serwer</h2>
+            </div>
+            <ul class="fact-list fact-list--visible">
+                <li>identyfikator i status pokoju</li>
+                <li>klucze publiczne</li>
+                <li>czas i rozmiar zaszyfrowanych ramek</li>
+            </ul>
+        </div>
+        <div>
+            <div class="section-heading section-heading--compact">
+                <span>04</span>
+                <h2>Czego nie widzi</h2>
+            </div>
+            <ul class="fact-list fact-list--hidden">
+                <li>treści wiadomości</li>
+                <li>kluczy prywatnych i kluczy AES</li>
+                <li>historii rozmowy</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="info-section wake-section" aria-labelledby="wake-title">
+        <div class="section-heading">
+            <span>05</span>
+            <div>
+                <h2 id="wake-title">Telefon podczas rozmowy</h2>
+                <p>
+                    Gdy pokój jest aktywny, strona prosi system o niewygaszanie ekranu.
+                    Po przełączeniu do innej aplikacji system zwalnia tę blokadę. Jeśli WebSocket
+                    zostanie wtedy przerwany, oczekujący twórca ma 2 minuty na powrót. Gość,
+                    który w tym czasie otworzy zaproszenie, nie musi odświeżać strony —
+                    połączenie jest ponawiane automatycznie co 3 sekundy. Także podczas rozmowy
+                    twórca i gość mają po 2 minuty na powrót do aplikacji. Wiadomości są wtedy
+                    wstrzymane, a jawne zakończenie nadal natychmiast spala pokój.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-warning">
+        <strong>Pełny link jest zaproszeniem.</strong>
+        <p>
+            Osoba, która przejmie go przed pierwszym użyciem, może zająć miejsce gościa.
+            Przy rozmowie wysokiego ryzyka porównaj kod bezpieczeństwa innym kanałem.
+        </p>
+    </section>
+
+    <footer class="info-footer">
+        <span>burnit.chat</span>
+        <a href="./">Rozpocznij rozmowę</a>
+    </footer>
+</main>
+</body>
+</html>

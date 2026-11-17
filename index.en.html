@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="One-time encrypted chat. The conversation disappears when it ends.">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; connect-src 'self' ws: wss:; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'">
+    <meta name="theme-color" content="#090d0c">
+    <title>burnit.chat — confidential chat without an account</title>
+    <link rel="icon" href="./assets/burnit-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+<main class="shell">
+    <header class="brand">
+        <a class="brand__mark" href="./" aria-label="burnit.chat — home">
+            <img src="./assets/burnit-mark.svg" alt="">
+        </a>
+        <div>
+            <strong>burnit.chat</strong>
+            <span>ephemeral encrypted channel</span>
+        </div>
+        <a class="info-link" href="./jak-to-dziala.html">How it works</a>
+        <nav class="language-switcher" aria-label="Choose language">
+            <a href="./set-language.php?lang=pl&amp;return=chat" data-language="pl"
+               aria-label="Polish version" title="Polski">
+                <img src="./assets/flag-pl.svg" alt="">
+            </a>
+            <a href="./set-language.php?lang=en&amp;return=chat" data-language="en"
+               aria-label="English version" title="English">
+                <img src="./assets/flag-en.svg" alt="">
+            </a>
+        </nav>
+        <div class="status status--idle" id="connection-status" aria-live="polite">
+            <i></i><span>Ready</span>
+        </div>
+    </header>
+
+    <section class="panel panel--welcome" id="welcome-view">
+        <div class="terminal-bar" aria-hidden="true">
+            <span><i></i><i></i><i></i></span>
+            <code>session://one-time-channel</code>
+            <em>NO LOGS</em>
+        </div>
+        <div class="welcome-content">
+            <div class="eyebrow"><span>●</span> Confidential 1:1 channel</div>
+            <h1><span>Confidential?</span><br>Write. Read. <em>Burn.</em></h1>
+            <p class="welcome-lead">
+                A one-time encrypted conversation for two people.
+                No account, no history, and no messages stored on the server.
+            </p>
+        </div>
+        <button class="button button--primary" id="create-room" type="button">
+            <span>Create a secure channel</span>
+            <kbd aria-hidden="true">↵</kbd>
+        </button>
+        <div class="trust-strip" aria-label="Key properties">
+            <span><i>✓</i> no login</span>
+            <span><i>✓</i> E2EE encryption</span>
+            <span><i>✓</i> only 2 people</span>
+        </div>
+    </section>
+
+    <section class="panel panel--invite hidden" id="invite-view">
+        <div class="panel-code" aria-hidden="true">ROOM / WAITING_FOR_PEER</div>
+        <div class="waiting-pulse" aria-hidden="true"><span></span></div>
+        <div class="eyebrow">Channel ready</div>
+        <h1>Share the invitation</h1>
+        <p class="lead">The first person to open the link locks the room to anyone else.</p>
+        <div class="copy-field">
+            <input id="invite-link" type="text" readonly aria-label="Invitation link">
+            <button class="button button--copy" id="copy-link" type="button">Copy</button>
+        </div>
+        <p class="safety-note"><span>◈</span> The link is a one-time key to enter. Send it through a trusted channel.</p>
+        <button class="button button--quiet" id="cancel-room" type="button">Cancel room</button>
+    </section>
+
+    <section class="panel panel--joining hidden" id="joining-view">
+        <div class="panel-code" aria-hidden="true">HANDSHAKE / ECDH_P256</div>
+        <div class="waiting-pulse" aria-hidden="true"><span></span></div>
+        <h1 id="joining-title">Connecting…</h1>
+        <p class="lead" id="joining-message">Preparing a secure channel.</p>
+        <div class="handshake-track" aria-hidden="true"><span></span><span></span><span></span></div>
+    </section>
+
+    <section class="chat hidden" id="chat-view" aria-label="Secure chat">
+        <div class="chat__notice">
+            <span class="shield" aria-hidden="true">⌁</span>
+            <div>
+                <strong><i></i> End-to-end encrypted tunnel</strong>
+                <span id="peer-label">The other person is connected</span>
+            </div>
+            <button class="button button--danger" id="end-chat" type="button">End</button>
+        </div>
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <form class="composer" id="message-form">
+            <label class="sr-only" for="message-input">Message</label>
+            <textarea id="message-input" rows="1" maxlength="4000"
+                      placeholder="Write a message…" autocomplete="off"
+                      enterkeyhint="send" inputmode="text" required></textarea>
+            <button class="send-button" type="submit" aria-label="Send message">→</button>
+        </form>
+    </section>
+
+    <section class="panel panel--closed hidden" id="closed-view">
+        <div class="panel-code" aria-hidden="true">SESSION / DESTROYED</div>
+        <div class="closed-icon" aria-hidden="true">⌁</div>
+        <div class="eyebrow">Channel closed</div>
+        <h1 id="closed-title">The conversation is gone</h1>
+        <p class="lead" id="closed-message">
+            This room cannot be opened again.
+        </p>
+        <a class="button button--primary" href="./">New conversation</a>
+    </section>
+</main>
+
+<noscript>burnit.chat requires JavaScript to perform encryption in your browser.</noscript>
+<script src="./config.js"></script>
+<script type="module" src="./assets/app.js"></script>
+</body>
+</html>

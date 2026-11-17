@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="How burnit.chat creates a one-time encrypted conversation channel.">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'">
+    <meta name="theme-color" content="#090d0c">
+    <title>How it works — burnit.chat</title>
+    <link rel="icon" href="./assets/burnit-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body class="info-page">
+<main class="info-shell">
+    <header class="brand info-header">
+        <a class="brand__mark" href="./" aria-label="burnit.chat — home">
+            <img src="./assets/burnit-mark.svg" alt="">
+        </a>
+        <div>
+            <strong>burnit.chat</strong>
+            <span>ephemeral encrypted channel</span>
+        </div>
+        <a class="info-link" href="./">Back to chat</a>
+        <nav class="language-switcher" aria-label="Choose language">
+            <a href="./set-language.php?lang=pl&amp;return=info" data-language="pl"
+               aria-label="Polish version" title="Polski">
+                <img src="./assets/flag-pl.svg" alt="">
+            </a>
+            <a href="./set-language.php?lang=en&amp;return=info" data-language="en"
+               aria-label="English version" title="English">
+                <img src="./assets/flag-en.svg" alt="">
+            </a>
+        </nav>
+    </header>
+
+    <section class="info-hero">
+        <div class="eyebrow"><span>●</span> How it works</div>
+        <h1>An encrypted tunnel.<br><span>Only between you.</span></h1>
+        <p>
+            Two browsers create a shared confidential channel that exists only
+            during the conversation. Encrypted data is forwarded by the server,
+            but only your browsers have the keys required to read it.
+        </p>
+    </section>
+
+    <section class="plain-tunnel" aria-labelledby="plain-tunnel-title">
+        <div class="plain-tunnel__visual" aria-hidden="true">
+            <span>YOU</span><i></i><strong>⌁ E2EE ⌁</strong><i></i><span>PERSON 2</span>
+        </div>
+        <div>
+            <div class="eyebrow">Simply put</div>
+            <h2 id="plain-tunnel-title">No logins. No email. No accounts.</h2>
+            <p>
+                We do not verify identities or create profiles. The link connects
+                exactly two people, and the conversation lives only in the memory of
+                their open browser tabs. Once the channel is burned, there is no archive
+                to return to.
+            </p>
+        </div>
+        <ul aria-label="What we do not require">
+            <li>login</li>
+            <li>email address</li>
+            <li>phone number</li>
+            <li>account history</li>
+        </ul>
+    </section>
+
+    <section class="info-section" aria-labelledby="key-exchange-title">
+        <div class="section-heading">
+            <span>01</span>
+            <div>
+                <h2 id="key-exchange-title">Key exchange</h2>
+                <p>Private keys never leave the devices.</p>
+            </div>
+        </div>
+
+        <div class="key-diagram key-diagram--desktop" role="img"
+             aria-label="Public keys pass through the forwarding server, both browsers calculate the same secret, and create an end-to-end encrypted tunnel">
+            <div class="diagram-phase">
+                <span>01 / PUBLIC HANDSHAKE</span>
+                <small>the forwarding server handles public data only</small>
+            </div>
+
+            <div class="diagram-party diagram-party--a">
+                <span class="party-icon">A</span>
+                <strong>Creator</strong>
+                <small><b>Private A</b> stays here</small>
+            </div>
+            <div class="diagram-relay">
+                <span>SERVER</span>
+                <strong>forwarding only</strong>
+                <small>forwards · never decrypts</small>
+                <i aria-hidden="true"></i>
+            </div>
+            <div class="diagram-party diagram-party--b">
+                <span class="party-icon">B</span>
+                <strong>Guest</strong>
+                <small><b>Private B</b> stays here</small>
+            </div>
+
+            <div class="diagram-routes">
+                <div>
+                    <span>A</span>
+                    <code>PUBLIC A</code>
+                    <i aria-hidden="true">→</i>
+                    <em>server</em>
+                    <i aria-hidden="true">→</i>
+                    <span>B</span>
+                </div>
+                <div>
+                    <span>A</span>
+                    <i aria-hidden="true">←</i>
+                    <em>server</em>
+                    <i aria-hidden="true">←</i>
+                    <code>PUBLIC B</code>
+                    <span>B</span>
+                </div>
+            </div>
+
+            <div class="diagram-secret diagram-secret--a">
+                <span>02 / locally</span>
+                <strong>ECDH + HKDF</strong>
+                <small>Private A × Public B</small>
+            </div>
+            <div class="diagram-equals" aria-hidden="true">
+                <span>=</span>
+                <small>same secret</small>
+            </div>
+            <div class="diagram-secret diagram-secret--b">
+                <span>02 / locally</span>
+                <strong>ECDH + HKDF</strong>
+                <small>Private B × Public A</small>
+            </div>
+
+            <div class="diagram-channel">
+                <span class="diagram-channel__end">A</span>
+                <i aria-hidden="true"></i>
+                <div>
+                    <small>03 / ENCRYPTED TUNNEL</small>
+                    <strong>Key A→B &nbsp;·&nbsp; AES-256-GCM &nbsp;·&nbsp; Key B→A</strong>
+                    <span>the server sees encrypted data only</span>
+                </div>
+                <i aria-hidden="true"></i>
+                <span class="diagram-channel__end">B</span>
+            </div>
+        </div>
+
+        <div class="key-diagram-mobile" role="img"
+             aria-label="On mobile: first both sides exchange public keys through the forwarding server, then locally calculate the same secret and open an end-to-end encrypted tunnel">
+            <article class="mobile-key-stage">
+                <span class="mobile-key-stage__number">01</span>
+                <div>
+                    <strong>Public exchange</strong>
+                    <small>The server only forwards public keys.</small>
+                </div>
+                <div class="mobile-public-route" aria-hidden="true">
+                    <span>A</span>
+                    <i></i>
+                    <em>SERVER</em>
+                    <i></i>
+                    <span>B</span>
+                    <small>PUBLIC A → B &nbsp;·&nbsp; PUBLIC B → A</small>
+                </div>
+                <p>Private A and Private B never leave the phones.</p>
+            </article>
+
+            <div class="mobile-stage-link" aria-hidden="true"><i></i><span>locally</span><i></i></div>
+
+            <article class="mobile-key-stage">
+                <span class="mobile-key-stage__number">02</span>
+                <div>
+                    <strong>The same secret</strong>
+                    <small>Each side calculates it locally.</small>
+                </div>
+                <div class="mobile-secret-row" aria-hidden="true">
+                    <span>A</span>
+                    <code>ECDH + HKDF</code>
+                    <b>=</b>
+                    <code>ECDH + HKDF</code>
+                    <span>B</span>
+                </div>
+            </article>
+
+            <div class="mobile-stage-link" aria-hidden="true"><i></i><span>encryption</span><i></i></div>
+
+            <article class="mobile-key-stage mobile-key-stage--channel">
+                <span class="mobile-key-stage__number">03</span>
+                <div>
+                    <strong>End-to-end tunnel</strong>
+                    <small>AES-256-GCM · a separate key in each direction</small>
+                </div>
+                <div class="mobile-channel-row" aria-hidden="true">
+                    <span>A</span><i></i><strong>ENCRYPTED DATA</strong><i></i><span>B</span>
+                </div>
+                <p>The server has no AES keys and cannot read the conversation.</p>
+            </article>
+        </div>
+
+        <ol class="steps">
+            <li>
+                <span>1</span>
+                <div>
+                    <h3>Creator's key pair</h3>
+                    <p>The creator generates an ephemeral ECDH pair. The room ID is a 128-bit digest of the creator's public key.</p>
+                </div>
+            </li>
+            <li>
+                <span>2</span>
+                <div>
+                    <h3>Short invitation</h3>
+                    <p>The invitation contains only a short room ID. The creator's full public key is temporarily held in server memory.</p>
+                </div>
+            </li>
+            <li>
+                <span>3</span>
+                <div>
+                    <h3>Public exchange</h3>
+                    <p>When the guest joins, the server forwards both public keys. Private keys never leave the browsers.</p>
+                </div>
+            </li>
+            <li>
+                <span>4</span>
+                <div>
+                    <h3>Key verification</h3>
+                    <p>The guest checks that the creator's key digest matches the ID in the link. Both sides then derive the AES keys.</p>
+                </div>
+            </li>
+            <li>
+                <span>5</span>
+                <div>
+                    <h3>Opening the tunnel</h3>
+                    <p>An encrypted key confirmation opens the channel. From then on, the server sees encrypted data only.</p>
+                </div>
+            </li>
+        </ol>
+    </section>
+
+    <section class="info-section" aria-labelledby="lifecycle-title">
+        <div class="section-heading">
+            <span>02</span>
+            <div>
+                <h2 id="lifecycle-title">Room lifecycle</h2>
+                <p>The room exists only for the lifetime of the connection.</p>
+            </div>
+        </div>
+
+        <div class="lifecycle">
+            <article>
+                <span>1</span>
+                <h3>Waiting</h3>
+                <p>The invitation waits for up to 15 minutes and accepts only the first guest. The creator has 2 minutes to return after a brief disconnect, while the guest page retries automatically every 3 seconds.</p>
+            </article>
+            <article>
+                <span>2</span>
+                <h3>Conversation</h3>
+                <p>Messages exist in the memory of two open tabs. The server stores no history, and after a brief connection loss both sides have 2 minutes to return.</p>
+            </article>
+            <article>
+                <span>3</span>
+                <h3>Disconnect</h3>
+                <p>A brief network loss gives both sides 2 minutes to return. Explicitly ending the chat invalidates the room immediately.</p>
+            </article>
+            <article>
+                <span>4</span>
+                <h3>Burn</h3>
+                <p>The room record is removed from MySQL, the other socket is closed, and keys and messages are removed from the view.</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="info-section info-grid" aria-labelledby="server-knowledge-title">
+        <div>
+            <div class="section-heading section-heading--compact">
+                <span>03</span>
+                <h2 id="server-knowledge-title">What the server sees</h2>
+            </div>
+            <ul class="fact-list fact-list--visible">
+                <li>room ID and status</li>
+                <li>public keys</li>
+                <li>timing and size of encrypted frames</li>
+            </ul>
+        </div>
+        <div>
+            <div class="section-heading section-heading--compact">
+                <span>04</span>
+                <h2>What it cannot see</h2>
+            </div>
+            <ul class="fact-list fact-list--hidden">
+                <li>message contents</li>
+                <li>private keys or AES keys</li>
+                <li>conversation history</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="info-section wake-section" aria-labelledby="wake-title">
+        <div class="section-heading">
+            <span>05</span>
+            <div>
+                <h2 id="wake-title">Using your phone during a chat</h2>
+                <p>
+                    While a room is active, the page asks the system to keep the screen awake.
+                    When you switch to another app, the system releases that lock. If the WebSocket
+                    is interrupted, the waiting creator has 2 minutes to return. A guest who
+                    opens the invitation during that time does not need to refresh the page —
+                    the connection retries automatically every 3 seconds. During a chat,
+                    both creator and guest have 2 minutes to return to the app. Messages are
+                    paused during that time, while explicitly ending the chat still burns the room immediately.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="info-warning">
+        <strong>The full link is the invitation.</strong>
+        <p>
+            Anyone who obtains it before first use can take the guest slot.
+            For a high-risk conversation, compare the security code through another channel.
+        </p>
+    </section>
+
+    <footer class="info-footer">
+        <span>burnit.chat</span>
+        <a href="./">Start a conversation</a>
+    </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+    <meta name="referrer" content="no-referrer">
+    <meta name="description" content="Jednorazowy, szyfrowany czat. Po rozłączeniu rozmowa znika.">
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src 'self'; connect-src 'self' ws: wss:; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'">
+    <meta name="theme-color" content="#090d0c">
+    <title>burnit.chat — poufny czat bez konta</title>
+    <link rel="icon" href="./assets/burnit-mark.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+</head>
+<body>
+<main class="shell">
+    <header class="brand">
+        <a class="brand__mark" href="./" aria-label="burnit.chat — strona główna">
+            <img src="./assets/burnit-mark.svg" alt="">
+        </a>
+        <div>
+            <strong>burnit.chat</strong>
+            <span>ephemeral encrypted channel</span>
+        </div>
+        <a class="info-link" href="./jak-to-dziala.html">Jak to działa?</a>
+        <nav class="language-switcher" aria-label="Wybierz język">
+            <a href="./set-language.php?lang=pl&amp;return=chat" data-language="pl"
+               aria-label="Wersja polska" title="Polski">
+                <img src="./assets/flag-pl.svg" alt="">
+            </a>
+            <a href="./set-language.php?lang=en&amp;return=chat" data-language="en"
+               aria-label="English version" title="English">
+                <img src="./assets/flag-en.svg" alt="">
+            </a>
+        </nav>
+        <div class="status status--idle" id="connection-status" aria-live="polite">
+            <i></i><span>Gotowy</span>
+        </div>
+    </header>
+
+    <section class="panel panel--welcome" id="welcome-view">
+        <div class="terminal-bar" aria-hidden="true">
+            <span><i></i><i></i><i></i></span>
+            <code>session://one-time-channel</code>
+            <em>NO LOGS</em>
+        </div>
+        <div class="welcome-content">
+            <div class="eyebrow"><span>●</span> Poufny kanał 1:1</div>
+            <h1><span>Poufne?</span><br>Napisz. Przeczytaj. <em>Spal.</em></h1>
+            <p class="welcome-lead">
+                Jednorazowa, szyfrowana rozmowa dla dwóch osób.
+                Bez konta, bez historii i bez wiadomości zapisanych na serwerze.
+            </p>
+        </div>
+        <button class="button button--primary" id="create-room" type="button">
+            <span>Utwórz bezpieczny kanał</span>
+            <kbd aria-hidden="true">↵</kbd>
+        </button>
+        <div class="trust-strip" aria-label="Najważniejsze właściwości">
+            <span><i>✓</i> bez logowania</span>
+            <span><i>✓</i> szyfrowanie E2EE</span>
+            <span><i>✓</i> tylko 2 osoby</span>
+        </div>
+    </section>
+
+    <section class="panel panel--invite hidden" id="invite-view">
+        <div class="panel-code" aria-hidden="true">ROOM / WAITING_FOR_PEER</div>
+        <div class="waiting-pulse" aria-hidden="true"><span></span></div>
+        <div class="eyebrow">Kanał gotowy</div>
+        <h1>Przekaż zaproszenie</h1>
+        <p class="lead">Pierwsza osoba, która otworzy link, zamknie wejście do pokoju.</p>
+        <div class="copy-field">
+            <input id="invite-link" type="text" readonly aria-label="Link z zaproszeniem">
+            <button class="button button--copy" id="copy-link" type="button">Kopiuj</button>
+        </div>
+        <p class="safety-note"><span>◈</span> Link jest jednorazowym kluczem do wejścia. Wyślij go zaufanym kanałem.</p>
+        <button class="button button--quiet" id="cancel-room" type="button">Anuluj pokój</button>
+    </section>
+
+    <section class="panel panel--joining hidden" id="joining-view">
+        <div class="panel-code" aria-hidden="true">HANDSHAKE / ECDH_P256</div>
+        <div class="waiting-pulse" aria-hidden="true"><span></span></div>
+        <h1 id="joining-title">Łączenie…</h1>
+        <p class="lead" id="joining-message">Przygotowujemy bezpieczny kanał.</p>
+        <div class="handshake-track" aria-hidden="true"><span></span><span></span><span></span></div>
+    </section>
+
+    <section class="chat hidden" id="chat-view" aria-label="Bezpieczny czat">
+        <div class="chat__notice">
+            <span class="shield" aria-hidden="true">⌁</span>
+            <div>
+                <strong><i></i> Tunel szyfrowany end-to-end</strong>
+                <span id="peer-label">Druga osoba jest połączona</span>
+            </div>
+            <button class="button button--danger" id="end-chat" type="button">Zakończ</button>
+        </div>
+        <div class="messages" id="messages" role="log" aria-live="polite" aria-relevant="additions"></div>
+        <form class="composer" id="message-form">
+            <label class="sr-only" for="message-input">Wiadomość</label>
+            <textarea id="message-input" rows="1" maxlength="4000"
+                      placeholder="Napisz wiadomość…" autocomplete="off"
+                      enterkeyhint="send" inputmode="text" required></textarea>
+            <button class="send-button" type="submit" aria-label="Wyślij wiadomość">→</button>
+        </form>
+    </section>
+
+    <section class="panel panel--closed hidden" id="closed-view">
+        <div class="panel-code" aria-hidden="true">SESSION / DESTROYED</div>
+        <div class="closed-icon" aria-hidden="true">⌁</div>
+        <div class="eyebrow">Kanał zamknięty</div>
+        <h1 id="closed-title">Rozmowa zniknęła</h1>
+        <p class="lead" id="closed-message">
+            Tego pokoju nie można otworzyć ponownie.
+        </p>
+        <a class="button button--primary" href="./">Nowa rozmowa</a>
+    </section>
+</main>
+
+<noscript>burnit.chat wymaga JavaScript / requires JavaScript do wykonania szyfrowania w przeglądarce.</noscript>
+<script src="./config.js"></script>
+<script type="module" src="./assets/app.js"></script>
+</body>
+</html>
